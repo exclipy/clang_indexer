@@ -1,10 +1,25 @@
+extern "C" {
 #include <clang-c/Index.h>
+}
+
+#include <boost/foreach.hpp>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <tr1/unordered_set>
+#include <tr1/unordered_map>
+
+struct VisitorContext {
+    typedef std::tr1::unordered_map< std::string, std::tr1::unordered_set<std::string> > IndexType;
+    IndexType usrToReferences;
+};
 
 enum CXChildVisitResult visitor(
         CXCursor cursor,
         CXCursor parent,
-        CXClientData client_data)
+        CXClientData clientData)
 {
+    VisitorContext* visitorContext = (VisitorContext*)clientData;
     CXCursor refCursor = clang_getCursorReferenced(cursor);
     if (!clang_equalCursors(refCursor, clang_getNullCursor())) {
         CXFile file;
@@ -20,14 +35,12 @@ enum CXChildVisitResult visitor(
                 &refFile, &refLine, &refColumn, &refOffset);
 
         if (clang_getFileName(file).data && clang_getFileName(refFile).data) {
-            printf("'%s' at %s:%d:%d refers to %s at %s:%d:%d\n",
-                    clang_getCString(clang_getCursorSpelling(cursor)),
-                    clang_getCString(clang_getFileName(file)),
-                    line, column,
-                    clang_getCString(clang_getCursorUSR(refCursor)),
-                    clang_getCString(clang_getFileName(refFile)),
-                    refLine, refColumn
-                    );
+            std::string referencedUsr(clang_getCString(clang_getCursorUSR(refCursor)));
+            std::stringstream ss;
+            ss << clang_getCString(clang_getFileName(file))
+               << ":" << line;
+            std::string location(ss.str());
+            visitorContext->usrToReferences[referencedUsr].insert(location);
         }
     }
     return CXChildVisit_Recurse;
@@ -59,10 +72,19 @@ int main(int argc, const char* argv[]) {
             return 1;
     }
 
+    VisitorContext visitorContext;
     clang_visitChildren(
             clang_getTranslationUnitCursor(tu),
             &visitor,
-            0);
+            &visitorContext);
+
+    BOOST_FOREACH(const VisitorContext::IndexType::value_type &it, visitorContext.usrToReferences) {
+        std::cout << it.first << '\t';
+        BOOST_FOREACH(const std::string& jt, it.second) {
+            std::cout << jt << ' ';
+        }
+        std::cout << std::endl;
+    }
 
     return 0;
 }
