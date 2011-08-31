@@ -1,2 +1,7 @@
+all: clang_index_linker clang_indexer
+
+clang_index_linker: clang_index_linker.cpp
+	$(CXX) clang_index_linker.cpp -o clang_index_linker
+
 clang_indexer: clang_indexer.cpp
-	g++ -I/Users/exclipy/src/llvm/tools/clang/include -L/opt/local/lib -lclang clang_indexer.cpp -o clang_indexer
+	$(CXX) clang_indexer.cpp -o clang_indexer
