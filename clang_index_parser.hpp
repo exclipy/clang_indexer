@@ -1,8 +1,7 @@
 #pragma once
 
-#include <istream>
-#include <string>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
+#include "types.hpp"
 
-std::tr1::unordered_map< std::string, std::tr1::unordered_set<std::string> > parseIndex(std::istream& in);
+#include <istream>
+
+Index parseIndex(std::istream& in);

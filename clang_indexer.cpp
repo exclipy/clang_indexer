@@ -2,18 +2,18 @@ extern "C" {
 #include <clang-c/Index.h>
 }
 
+#include "clang_index_printer.hpp"
+#include "types.hpp"
+
 #include <boost/foreach.hpp>
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <tr1/unordered_set>
-#include <tr1/unordered_map>
 
 // This code intentionally leaks memory like a sieve because the program is shortlived.
 
 struct VisitorContext {
-    typedef std::tr1::unordered_map< std::string, std::tr1::unordered_set<std::string> > IndexType;
-    IndexType usrToReferences;
+    Index usrToReferences;
 };
 
 enum CXChildVisitResult visitor(
@@ -78,16 +78,7 @@ int main(int argc, const char* argv[]) {
             &visitor,
             &visitorContext);
 
-    BOOST_FOREACH(const VisitorContext::IndexType::value_type &it, visitorContext.usrToReferences) {
-        std::cout << it.first << '\t';
-        bool first = true;
-        BOOST_FOREACH(const std::string& jt, it.second) {
-            if (!first) std::cout << ' ';
-            std::cout << jt;
-            first = false;
-        }
-        std::cout << std::endl;
-    }
+    printIndex(std::cout, visitorContext.usrToReferences);
 
     return 0;
 }

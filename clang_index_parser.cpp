@@ -20,7 +20,7 @@ using std::tr1::unordered_set;
 using std::tr1::unordered_map;
 
 template <typename Iterator>
-struct Grammar : qi::grammar<Iterator, unordered_map< std::string, unordered_set<std::string> > ()>
+struct Grammar : qi::grammar<Iterator, Index ()>
 {
     Grammar() : Grammar::base_type(start)
     {
@@ -38,17 +38,17 @@ struct Grammar : qi::grammar<Iterator, unordered_map< std::string, unordered_set
     qi::rule<Iterator, std::string ()> word;
     qi::rule<Iterator, unordered_set<std::string> ()> wordSet;
     qi::rule<Iterator, std::pair< std::string, unordered_set<std::string> > ()> line;
-    qi::rule<Iterator, unordered_map< std::string, unordered_set<std::string> > ()> start;
+    qi::rule<Iterator, Index ()> start;
 };
 
-unordered_map< std::string, unordered_set<std::string> > parseIndex(std::istream& in) {
+Index parseIndex(std::istream& in) {
     in.unsetf(std::ios::skipws);
     spirit::istream_iterator begin(in);
     spirit::istream_iterator end;
 
     Grammar<spirit::istream_iterator> grammar;
 
-    unordered_map< std::string, unordered_set<std::string> > parsedResult;
+    Index parsedResult;
 
     bool ok = qi::parse(begin, end, grammar, parsedResult);
 

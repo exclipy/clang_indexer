@@ -1,7 +1,21 @@
 all: clang_index_linker clang_indexer
 
-clang_index_linker: clang_index_linker.o clang_index_parser.o
-	$(CXX) clang_index_linker.o clang_index_parser.o -o clang_index_linker
+HEADERS = \
+	types.hpp \
+	clang_index_parser.hpp \
+	clang_index_printer.hpp
 
-clang_indexer: clang_indexer.cpp
-	$(CXX) -lclang clang_indexer.cpp -o clang_indexer
+INDEXER_OBJECTS = \
+	clang_indexer.o \
+	clang_index_printer.o
+
+LINKER_OBJECTS = \
+	clang_index_linker.o \
+	clang_index_parser.o \
+	clang_index_printer.o
+
+clang_indexer: $(INDEXER_OBJECTS) $(HEADERS)
+	$(CXX) -lclang $(INDEXER_OBJECTS) -o $@
+
+clang_index_linker: $(LINKER_OBJECTS) $(HEADERS)
+	$(CXX) $(LINKER_OBJECTS) -o $@
