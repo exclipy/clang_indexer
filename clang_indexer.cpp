@@ -12,40 +12,50 @@ extern "C" {
 
 // This code intentionally leaks memory like a sieve because the program is shortlived.
 
-struct VisitorContext {
+class IVisitor {
+public:
+    virtual enum CXChildVisitResult visit(CXCursor cursor, CXCursor parent) = 0;
+};
+
+class EverythingIndexer : public IVisitor {
+public:
+    virtual enum CXChildVisitResult visit(CXCursor cursor, CXCursor parent) {
+        CXCursor refCursor = clang_getCursorReferenced(cursor);
+        if (!clang_equalCursors(refCursor, clang_getNullCursor())) {
+            CXFile file;
+            unsigned int line, column, offset;
+            clang_getInstantiationLocation(
+                    clang_getCursorLocation(cursor),
+                    &file, &line, &column, &offset);
+
+            CXFile refFile;
+            unsigned int refLine, refColumn, refOffset;
+            clang_getInstantiationLocation(
+                    clang_getCursorLocation(refCursor),
+                    &refFile, &refLine, &refColumn, &refOffset);
+
+            if (clang_getFileName(file).data && clang_getFileName(refFile).data) {
+                std::string referencedUsr(clang_getCString(clang_getCursorUSR(refCursor)));
+                std::stringstream ss;
+                ss << clang_getCString(clang_getFileName(file))
+                   << ":" << line;
+                std::string location(ss.str());
+                usrToReferences[referencedUsr].insert(location);
+            }
+        }
+        return CXChildVisit_Recurse;
+    }
+
     Index usrToReferences;
 };
 
-enum CXChildVisitResult visitor(
+enum CXChildVisitResult visitorFunction(
         CXCursor cursor,
         CXCursor parent,
         CXClientData clientData)
 {
-    VisitorContext* visitorContext = (VisitorContext*)clientData;
-    CXCursor refCursor = clang_getCursorReferenced(cursor);
-    if (!clang_equalCursors(refCursor, clang_getNullCursor())) {
-        CXFile file;
-        unsigned int line, column, offset;
-        clang_getInstantiationLocation(
-                clang_getCursorLocation(cursor),
-                &file, &line, &column, &offset);
-
-        CXFile refFile;
-        unsigned int refLine, refColumn, refOffset;
-        clang_getInstantiationLocation(
-                clang_getCursorLocation(refCursor),
-                &refFile, &refLine, &refColumn, &refOffset);
-
-        if (clang_getFileName(file).data && clang_getFileName(refFile).data) {
-            std::string referencedUsr(clang_getCString(clang_getCursorUSR(refCursor)));
-            std::stringstream ss;
-            ss << clang_getCString(clang_getFileName(file))
-               << ":" << line;
-            std::string location(ss.str());
-            visitorContext->usrToReferences[referencedUsr].insert(location);
-        }
-    }
-    return CXChildVisit_Recurse;
+    IVisitor* visitor = (IVisitor*)clientData;
+    return visitor->visit(cursor, parent);
 }
 
 int main(int argc, const char* argv[]) {
@@ -72,13 +82,13 @@ int main(int argc, const char* argv[]) {
         }
     }
 
-    VisitorContext visitorContext;
+    EverythingIndexer visitor;
     clang_visitChildren(
             clang_getTranslationUnitCursor(tu),
-            &visitor,
-            &visitorContext);
+            &visitorFunction,
+            &visitor);
 
-    printIndex(std::cout, visitorContext.usrToReferences);
+    printIndex(std::cout, visitor.usrToReferences);
 
     return 0;
 }
