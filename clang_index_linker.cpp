@@ -13,8 +13,7 @@ int main(int argc, char* argv[]) {
         if (file.fail()) {
             std::cerr << argv[i] << " cannot be opened" << std::endl;
         } else {
-            Index index = parseIndex(file);
-            BOOST_FOREACH(const Index::value_type& it, index) {
+            BOOST_FOREACH(const Index::value_type& it, parseIndex(file)) {
                 mergedIndex[it.first].insert(it.second.begin(), it.second.end());
             }
         }
