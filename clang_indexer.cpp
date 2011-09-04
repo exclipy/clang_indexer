@@ -49,6 +49,15 @@ public:
     Index usrToReferences;
 };
 
+class DefinitionIndexer : public EverythingIndexer {
+public:
+    virtual enum CXChildVisitResult visit(CXCursor cursor, CXCursor parent) {
+        if (!clang_isCursorDefinition(cursor))
+            return CXChildVisit_Recurse;
+        return EverythingIndexer::visit(cursor, parent);
+    }
+};
+
 enum CXChildVisitResult visitorFunction(
         CXCursor cursor,
         CXCursor parent,
@@ -82,7 +91,10 @@ int main(int argc, const char* argv[]) {
         }
     }
 
+    // Pick how much to index here:
+    // DefinitionIndexer visitor;
     EverythingIndexer visitor;
+
     clang_visitChildren(
             clang_getTranslationUnitCursor(tu),
             &visitorFunction,
