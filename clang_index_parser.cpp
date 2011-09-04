@@ -29,11 +29,12 @@ struct Grammar : qi::grammar<Iterator, IndexItem ()>
         using qi::_val;
         using qi::_1;
         using qi::char_;
+        using qi::lit;
         using qi::eps;
         using ascii::space;
 
-        word    = eps[_val = ""]            >> (+ (char_ - space)[_val += _1]);
-        wordSet = eps[phoenix::clear(_val)] >> (+word[phoenix::insert(_val, _1)] % ' ');
+        word    = eps[_val = ""]            >> (+ (char_ - (lit('\t') | lit('\n')))[_val += _1]);
+        wordSet = eps[phoenix::clear(_val)] >> (+word[phoenix::insert(_val, _1)] % '\t');
         line    %= word >> '\t' >> wordSet >> '\n';
     }
 
