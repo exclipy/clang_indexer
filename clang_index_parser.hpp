@@ -2,11 +2,14 @@
 
 #include "types.hpp"
 
+#include <boost/iterator/iterator_facade.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/spirit/include/support_istream_iterator.hpp>
 
 #include <istream>
+
+class IndexItemParseRange;
 
 class IndexItemIterator : public boost::iterator_facade<
         IndexItemIterator,
@@ -19,7 +22,7 @@ public:
 
     IndexItemIterator();
 
-    IndexItemIterator(std::istream& in);
+    IndexItemIterator(IndexItemParseRange* range);
 
 private:
     friend class boost::iterator_core_access;
@@ -28,11 +31,17 @@ private:
     bool equal(const IndexItemIterator& other) const;
     void increment();
 
-    boost::shared_ptr<IndexItem> value;
-    std::ptrdiff_t i;
-    std::istream* in;
-    boost::spirit::istream_iterator inputBegin;
-    boost::spirit::istream_iterator inputEnd;
+    std::ptrdiff_t count;
+    IndexItemParseRange* range;
 };
 
-boost::iterator_range<IndexItemIterator> parseIndex(std::istream& in);
+#include <boost/range/any_range.hpp>
+
+typedef boost::any_range<
+    IndexItem,
+    boost::single_pass_traversal_tag,
+    const IndexItem&,
+    boost::use_default
+    > RangeOfIndexItem;
+
+RangeOfIndexItem parseIndex(const boost::shared_ptr<std::istream>& in);
