@@ -6,6 +6,8 @@ extern "C" {
 #include "types.hpp"
 
 #include <boost/foreach.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -100,7 +102,11 @@ int main(int argc, const char* argv[]) {
             &visitorFunction,
             &visitor);
 
-    printIndex(std::cout, visitor.usrToReferences);
+    boost::iostreams::filtering_stream<boost::iostreams::output> zout;
+    zout.push(boost::iostreams::gzip_compressor());
+    zout.push(std::cout);
+
+    printIndex(zout, visitor.usrToReferences);
 
     return 0;
 }

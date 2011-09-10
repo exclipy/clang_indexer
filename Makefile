@@ -14,8 +14,13 @@ LINKER_OBJECTS = \
 	clang_index_parser.o \
 	clang_index_printer.o
 
+CXXFLAGS = -g
+
 clang_indexer: $(INDEXER_OBJECTS) $(HEADERS)
-	$(CXX) -lclang $(INDEXER_OBJECTS) -o $@
+	$(CXX) -lclang -lboost_iostreams -lz $(INDEXER_OBJECTS) -o $@
 
 clang_index_linker: $(LINKER_OBJECTS) $(HEADERS)
-	$(CXX) $(LINKER_OBJECTS) -o $@
+	$(CXX) -lboost_iostreams -lz $(LINKER_OBJECTS) -o $@
+
+clean:
+	rm *.o clang_indexer clang_index_linker

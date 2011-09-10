@@ -4,6 +4,8 @@
 #include <fstream>
 #include <iostream>
 #include <boost/foreach.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 
 int main(int argc, char* argv[]) {
     using std::cerr;
@@ -18,10 +20,18 @@ int main(int argc, char* argv[]) {
         if (file.fail()) {
             cerr << argv[i] << " cannot be opened" << endl;
         } else {
-            BOOST_FOREACH(const Index::value_type& it, parseIndex(file)) {
+            boost::iostreams::filtering_stream<boost::iostreams::input> zfile;
+            zfile.push(boost::iostreams::gzip_decompressor());
+            zfile.push(file);
+
+            BOOST_FOREACH(const Index::value_type& it, parseIndex(zfile)) {
                 mergedIndex[it.first].insert(it.second.begin(), it.second.end());
             }
         }
     }
-    printIndex(cout, mergedIndex);
+
+    boost::iostreams::filtering_stream<boost::iostreams::output> zout;
+    zout.push(boost::iostreams::gzip_compressor());
+    zout.push(cout);
+    printIndex(zout, mergedIndex);
 }
