@@ -18,9 +18,6 @@ namespace ascii = boost::spirit::ascii;
 namespace qi = boost::spirit::qi;
 namespace phoenix = boost::phoenix;
 
-using std::tr1::unordered_set;
-using std::tr1::unordered_map;
-
 template <typename Iterator>
 struct Grammar : qi::grammar<Iterator, IndexItem ()>
 {
@@ -39,7 +36,7 @@ struct Grammar : qi::grammar<Iterator, IndexItem ()>
     }
 
     qi::rule<Iterator, std::string ()> word;
-    qi::rule<Iterator, unordered_set<std::string> ()> wordSet;
+    qi::rule<Iterator, std::set<std::string> ()> wordSet;
     qi::rule<Iterator, IndexItem ()> line;
 };
 

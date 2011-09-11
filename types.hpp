@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
+#include <map>
+#include <set>
 
-typedef std::tr1::unordered_map< std::string, std::tr1::unordered_set<std::string> > Index;
-typedef std::pair< std::string, std::tr1::unordered_set<std::string> > IndexItem;
+typedef std::map< std::string, std::set<std::string> > Index;
+typedef std::pair< std::string, std::set<std::string> > IndexItem;
