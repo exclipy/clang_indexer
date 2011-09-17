@@ -41,3 +41,25 @@ target_link_libraries(index2db
     ${ZLIB_LIBRARIES}
     ${DB_LIBRARIES}
 )
+
+add_executable(dbclear dbclear.cpp)
+target_link_libraries(dbclear
+    ${DB_LIBRARIES}
+)
+
+add_executable(dbadd dbadd.cpp)
+target_link_libraries(dbadd
+    common
+    ${Boost_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${DB_LIBRARIES}
+    ${LibClang_LIBRARIES}
+)
+
+add_executable(dbrm dbrm.cpp)
+target_link_libraries(dbrm
+    common
+    ${Boost_LIBRARIES}
+    ${ZLIB_LIBRARIES}
+    ${DB_LIBRARIES}
+)
