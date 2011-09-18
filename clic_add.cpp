@@ -30,6 +30,7 @@ public:
             clang_getInstantiationLocation(
                     clang_getCursorLocation(cursor),
                     &file, &line, &column, &offset);
+            CXCursorKind kind = clang_getCursorKind(cursor);
 
             CXFile refFile;
             unsigned int refLine, refColumn, refOffset;
@@ -41,8 +42,8 @@ public:
                 std::string referencedUsr(clang_getCString(clang_getCursorUSR(refCursor)));
                 if (!referencedUsr.empty()) {
                     std::stringstream ss;
-                    ss << clang_getCString(clang_getFileName(file))
-                       << ":" << line;
+                    ss << kind << ":" << clang_getCString(clang_getFileName(file))
+                       << ":" << line << ":" << column;
                     std::string location(ss.str());
                     usrToReferences[referencedUsr].insert(location);
                 }
