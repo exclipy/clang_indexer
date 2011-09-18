@@ -19,29 +19,6 @@ include_directories(
 
 add_library(common STATIC clang_index_parser.cpp clang_index_printer.cpp)
 
-add_executable(indexer clang_indexer.cpp)
-target_link_libraries(indexer
-    common
-    ${Boost_LIBRARIES}
-    ${ZLIB_LIBRARIES}
-    ${LibClang_LIBRARIES}
-)
-
-add_executable(linker clang_index_linker.cpp)
-target_link_libraries(linker
-    common
-    ${Boost_LIBRARIES}
-    ${ZLIB_LIBRARIES}
-)
-
-add_executable(index2db clang_index2db.cpp)
-target_link_libraries(index2db
-    common
-    ${Boost_LIBRARIES}
-    ${ZLIB_LIBRARIES}
-    ${DB_LIBRARIES}
-)
-
 add_executable(dbclear dbclear.cpp)
 target_link_libraries(dbclear
     ${DB_LIBRARIES}
