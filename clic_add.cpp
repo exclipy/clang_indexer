@@ -1,4 +1,4 @@
-#include "clang_index_printer.hpp"
+#include "clic_printer.hpp"
 #include "types.hpp"
 
 extern "C" {
@@ -51,7 +51,7 @@ public:
         return CXChildVisit_Recurse;
     }
 
-    Index usrToReferences;
+    ClicIndex usrToReferences;
 };
 
 class DefinitionIndexer : public EverythingIndexer {
@@ -107,7 +107,7 @@ int main(int argc, const char* argv[]) {
             clang_getTranslationUnitCursor(tu),
             &visitorFunction,
             &visitor);
-    Index& index = visitor.usrToReferences;
+    ClicIndex& index = visitor.usrToReferences;
 
     // OK, now write the index to a compressed file
     char* indexFilename = new char[strlen(sourceFilename)+10];
@@ -126,7 +126,7 @@ int main(int argc, const char* argv[]) {
         db.open(NULL, dbFilename, NULL, DB_BTREE, DB_CREATE, 0);
 
         for (int i = 1; i < argc; i++) {
-            BOOST_FOREACH(const Index::value_type& it, index) {
+            BOOST_FOREACH(const ClicIndex::value_type& it, index) {
                 const std::string& usr = it.first;
                 BOOST_FOREACH(const std::string& location, it.second) {
                     Dbt key(const_cast<char*>(usr.c_str()), usr.size());

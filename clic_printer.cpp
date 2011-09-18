@@ -1,12 +1,12 @@
-#include "clang_index_printer.hpp"
+#include "clic_printer.hpp"
 
 #include <boost/foreach.hpp>
 
 void printIndex(
     std::ostream& out,
-    const Index& index)
+    const ClicIndex& index)
 {
-    BOOST_FOREACH(const Index::value_type& it, index) {
+    BOOST_FOREACH(const ClicIndex::value_type& it, index) {
         if (!it.first.empty()) {
             out << it.first << '\t';
             bool first = true;

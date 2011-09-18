@@ -1,4 +1,4 @@
-#include "clang_index_parser.hpp"
+#include "clic_parser.hpp"
 
 #include <boost/config/warning_disable.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
@@ -19,7 +19,7 @@ namespace qi = boost::spirit::qi;
 namespace phoenix = boost::phoenix;
 
 template <typename Iterator>
-struct Grammar : qi::grammar<Iterator, IndexItem ()>
+struct Grammar : qi::grammar<Iterator, ClicIndexItem ()>
 {
     Grammar() : Grammar::base_type(line)
     {
@@ -37,7 +37,7 @@ struct Grammar : qi::grammar<Iterator, IndexItem ()>
 
     qi::rule<Iterator, std::string ()> word;
     qi::rule<Iterator, std::set<std::string> ()> wordSet;
-    qi::rule<Iterator, IndexItem ()> line;
+    qi::rule<Iterator, ClicIndexItem ()> line;
 };
 
 Grammar<spirit::istream_iterator> grammar;
@@ -45,7 +45,7 @@ Grammar<spirit::istream_iterator> grammar;
 IndexItemIterator::IndexItemIterator() : i(-1) {}
 
 IndexItemIterator::IndexItemIterator(std::istream& in) :
-    value(boost::make_shared<IndexItem>()),
+    value(boost::make_shared<ClicIndexItem>()),
     i(0),
     in(&in),
     inputBegin(in)
@@ -53,7 +53,7 @@ IndexItemIterator::IndexItemIterator(std::istream& in) :
     in.unsetf(std::ios::skipws);
 }
 
-const IndexItem& IndexItemIterator::dereference() const {
+const ClicIndexItem& IndexItemIterator::dereference() const {
     return *value;
 }
 

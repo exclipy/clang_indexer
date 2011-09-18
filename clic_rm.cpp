@@ -1,5 +1,5 @@
-#include "clang_index_parser.hpp"
-#include "clang_index_printer.hpp"
+#include "clic_parser.hpp"
+#include "clic_printer.hpp"
 
 #include <db_cxx.h>
 #include <boost/foreach.hpp>
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
             Dbc* cursor;
             try {
                 db.cursor(0, &cursor, 0);
-                BOOST_FOREACH(const Index::value_type& it, parseIndex(zfile)) {
+                BOOST_FOREACH(const ClicIndex::value_type& it, parseIndex(zfile)) {
                     const std::string& usr = it.first;
                     BOOST_FOREACH(const std::string& location, it.second) {
                         Dbt key(const_cast<char*>(usr.c_str()), usr.size());

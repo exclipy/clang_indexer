@@ -1,13 +1,13 @@
 #!/bin/bash
 
 add_to_index() {
-    echo dbadd index.db `cat .clang_complete` $1
-    dbadd index.db `cat .clang_complete` $1
+    echo clic_add index.db `cat .clang_complete` $1
+    clic_add index.db `cat .clang_complete` $1
 }
 
 remove_from_index() {
-    echo dbrm index.db $1.i.gz
-    dbrm index.db $1.i.gz
+    echo clic_rm index.db $1.i.gz
+    clic_rm index.db $1.i.gz
     echo rm $1.i.gz
     rm $1.i.gz
 }
@@ -16,7 +16,7 @@ find . -name "*.cpp" | sort > files2.txt
 
 if [ ! -f index.db -o ! -f files.txt ]; then
     echo "Creating database"
-    dbclear index.db
+    clic_clear index.db
     for i in `cat files2.txt`
     do
         add_to_index $i

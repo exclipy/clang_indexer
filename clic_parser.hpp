@@ -10,9 +10,9 @@
 
 class IndexItemIterator : public boost::iterator_facade<
         IndexItemIterator,
-        const IndexItem,
+        const ClicIndexItem,
         boost::single_pass_traversal_tag,
-        const IndexItem&,
+        const ClicIndexItem&,
         std::ptrdiff_t
     > {
 public:
@@ -24,11 +24,11 @@ public:
 private:
     friend class boost::iterator_core_access;
 
-    const IndexItem& dereference() const;
+    const ClicIndexItem& dereference() const;
     bool equal(const IndexItemIterator& other) const;
     void increment();
 
-    boost::shared_ptr<IndexItem> value;
+    boost::shared_ptr<ClicIndexItem> value;
     std::ptrdiff_t i;
     std::istream* in;
     boost::spirit::istream_iterator inputBegin;

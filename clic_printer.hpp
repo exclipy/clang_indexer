@@ -6,4 +6,4 @@
 
 void printIndex(
     std::ostream& out,
-    const Index& index);
+    const ClicIndex& index);

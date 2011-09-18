@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project (clang_indexer_project)
+project (clic_project)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -17,15 +17,15 @@ include_directories(
     ${DB_INCLUDE_DIRS}
 )
 
-add_library(common STATIC clang_index_parser.cpp clang_index_printer.cpp)
+add_library(common STATIC clic_parser.cpp clic_printer.cpp)
 
-add_executable(dbclear dbclear.cpp)
-target_link_libraries(dbclear
+add_executable(clic_clear clic_clear.cpp)
+target_link_libraries(clic_clear
     ${DB_LIBRARIES}
 )
 
-add_executable(dbadd dbadd.cpp)
-target_link_libraries(dbadd
+add_executable(clic_add clic_add.cpp)
+target_link_libraries(clic_add
     common
     ${Boost_LIBRARIES}
     ${ZLIB_LIBRARIES}
@@ -33,8 +33,8 @@ target_link_libraries(dbadd
     ${LibClang_LIBRARIES}
 )
 
-add_executable(dbrm dbrm.cpp)
-target_link_libraries(dbrm
+add_executable(clic_rm clic_rm.cpp)
+target_link_libraries(clic_rm
     common
     ${Boost_LIBRARIES}
     ${ZLIB_LIBRARIES}
