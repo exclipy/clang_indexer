@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Specify files to index here
+find . -name "*.cpp" | sort > files2.txt
+
 add_to_index() {
     echo clic_add index.db `cat .clang_complete` $1
     clic_add index.db `cat .clang_complete` $1
@@ -11,8 +14,6 @@ remove_from_index() {
     echo rm $1.i.gz
     rm $1.i.gz
 }
-
-find . -name "*.cpp" | sort > files2.txt
 
 if [ ! -f index.db -o ! -f files.txt ]; then
     echo "Creating database"
@@ -38,10 +39,12 @@ for i in `comm -23 files.txt files2.txt`; do
     remove_from_index $i
 done
 
-# modified files (that weren't added)
-for i in `comm -23 <(find . -newer files.txt -name "*.cpp" | sort) filesadded.txt`; do
-    remove_from_index $i
-    add_to_index $i
+# Update modified files
+for i in `cat files.txt`; do
+    if [ -f $i -a $i -nt files.txt ]; then
+        remove_from_index $i
+        add_to_index $i
+    fi
 done
 
 rm filesadded.txt
