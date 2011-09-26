@@ -4,7 +4,7 @@
 extern "C" {
 #include <clang-c/Index.h>
 }
-#include <db_cxx.h>
+#include "clic_db.hpp"
 #include <boost/foreach.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -120,27 +120,16 @@ int main(int argc, const char* argv[]) {
     printIndex(zout, index);
 
     // Now open the database and add the index to it
-    Db db(NULL, 0);
-    try {
-        db.set_error_stream(&std::cerr);
-        db.set_flags(DB_DUPSORT);
-        db.open(NULL, dbFilename, NULL, DB_BTREE, DB_CREATE, 0);
+    ClicDb db(dbFilename);
 
-        for (int i = 1; i < argc; i++) {
-            BOOST_FOREACH(const ClicIndex::value_type& it, index) {
-                const std::string& usr = it.first;
-                BOOST_FOREACH(const std::string& location, it.second) {
-                    Dbt key(const_cast<char*>(usr.c_str()), usr.size());
-                    Dbt value(const_cast<char*>(location.c_str()), location.size());
-                    db.put(NULL, &key, &value, DB_NODUPDATA);
-                }
+    for (int i = 1; i < argc; i++) {
+        BOOST_FOREACH(const ClicIndex::value_type& it, index) {
+            const std::string& usr = it.first;
+            BOOST_FOREACH(const std::string& location, it.second) {
+                db.put(usr, location);
             }
         }
-        db.close(0);
-    } catch(DbException &e) {
-        std::cerr << "Exception thrown: " << e.what() << std::endl;
-        return 1;
-    } 
+    }
 
     return 0;
 }
