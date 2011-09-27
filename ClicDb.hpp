@@ -2,22 +2,6 @@
 
 #include <db_cxx.h>
 
-class ClicCursor {
-    public:
-        ClicCursor(Db& db) {
-            db.cursor(0, &cursor, 0);
-        }
-        void rm(Dbt* key, Dbt* value) {
-            if (cursor->get(key, value, DB_GET_BOTH) != DB_NOTFOUND)
-                cursor->del(0);
-        }
-        ~ClicCursor() {
-            cursor->close();
-        }
-    private:
-        Dbc* cursor;
-};
-
 class ClicDb {
     public:
         ClicDb(const char* dbFilename) : db(NULL, 0)
@@ -65,5 +49,21 @@ class ClicDb {
         }
 
     private:
+        class ClicCursor {
+            public:
+                ClicCursor(Db& db) {
+                    db.cursor(0, &cursor, 0);
+                }
+                void rm(Dbt* key, Dbt* value) {
+                    if (cursor->get(key, value, DB_GET_BOTH) != DB_NOTFOUND)
+                        cursor->del(0);
+                }
+                ~ClicCursor() {
+                    cursor->close();
+                }
+            private:
+                Dbc* cursor;
+        };
+
         Db db;
 };

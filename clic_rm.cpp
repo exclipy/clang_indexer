@@ -1,7 +1,7 @@
 #include "clic_parser.hpp"
 #include "clic_printer.hpp"
 
-#include "clic_db.hpp"
+#include "ClicDb.hpp"
 #include <boost/foreach.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>

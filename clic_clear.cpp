@@ -1,4 +1,4 @@
-#include "clic_db.hpp"
+#include "ClicDb.hpp"
 #include <cassert>
 
 int main(int argc, char* argv[]) {
