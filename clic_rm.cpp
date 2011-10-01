@@ -22,10 +22,7 @@ int main(int argc, char* argv[]) {
         zfile.push(file);
 
         BOOST_FOREACH(const ClicIndex::value_type& it, parseIndex(zfile)) {
-            const std::string& usr = it.first;
-            BOOST_FOREACH(const std::string& location, it.second) {
-                db.rm(usr, location);
-            }
+            db.rmMultiple(it.first, it.second);
         }
     }
 }

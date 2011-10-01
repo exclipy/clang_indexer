@@ -1,6 +1,15 @@
 #pragma once
 
+#include "clic_printer.hpp"
+#include "clic_parser.hpp"
 #include <db_cxx.h>
+#include <boost/foreach.hpp>
+#include <boost/range/algorithm.hpp>
+#include <boost/algorithm/string.hpp>
+#include <set>
+#include <sstream>
+
+#include <iterator>
 
 class ClicDb {
     public:
@@ -8,7 +17,6 @@ class ClicDb {
         {
             try {
                 db.set_error_stream(&std::cerr);
-                db.set_flags(DB_DUPSORT);
                 db.open(NULL, dbFilename, NULL, DB_BTREE, DB_CREATE, 0);
             } catch(DbException &e) {
                 std::cerr << "Exception thrown: " << e.what() << std::endl;
@@ -25,22 +33,41 @@ class ClicDb {
             }
         }
 
-        void put(const std::string& usr, const std::string& location) {
-            try {
-                Dbt key(const_cast<char*>(usr.c_str()), usr.size());
-                Dbt value(const_cast<char*>(location.c_str()), location.size());
-                db.put(NULL, &key, &value, DB_NODUPDATA);
-            } catch(DbException &e) {
-                std::cerr << "Exception thrown: " << e.what() << std::endl;
-                exit(1);
-            }
+        void set(const std::string& usr, const std::set<std::string>& locations) {
+            std::stringstream ss;
+            printLocations(ss, locations);
+            std::string locationsString = ss.str();
+            Dbt key(const_cast<char*>(usr.c_str()), usr.size());
+            Dbt value(const_cast<char*>(locationsString.c_str()), locationsString.size());
+            db.put(NULL, &key, &value, 0);
         }
 
-        void rm(const std::string& usr, const std::string& location) {
-            ClicCursor cursor(db);
+        std::set<std::string> get(const std::string& usr) {
             Dbt key(const_cast<char*>(usr.c_str()), usr.size());
-            Dbt value(const_cast<char*>(location.c_str()), location.size());
-            cursor.rm(&key, &value);
+            Dbt value;
+            if (db.get(NULL, &key, &value, 0) == DB_NOTFOUND)
+                return std::set<std::string>();
+            std::string str((char*)value.get_data(), value.get_size());
+            std::set<std::string> result;
+            boost::algorithm::split(result, str, boost::algorithm::is_any_of("\t"));
+            return result;
+        }
+
+        void addMultiple(const std::string& usr, const std::set<std::string>& locationsToAdd) {
+            std::set<std::string> storedLocations = get(usr);
+            int originalCount = storedLocations.size();
+            boost::copy(locationsToAdd, std::inserter(storedLocations, storedLocations.begin()));
+            if (storedLocations.size() > originalCount)
+                set(usr, storedLocations);
+        }
+
+        void rmMultiple(const std::string& usr, const std::set<std::string>& locationsToRemove) {
+            std::set<std::string> storedLocations = get(usr);
+            int originalCount = storedLocations.size();
+            BOOST_FOREACH(std::string loc, locationsToRemove)
+                storedLocations.erase(loc);
+            if (storedLocations.size() < originalCount)
+                set(usr, storedLocations);
         }
 
         ~ClicDb() {

@@ -122,13 +122,9 @@ int main(int argc, const char* argv[]) {
     // Now open the database and add the index to it
     ClicDb db(dbFilename);
 
-    for (int i = 1; i < argc; i++) {
-        BOOST_FOREACH(const ClicIndex::value_type& it, index) {
-            const std::string& usr = it.first;
-            BOOST_FOREACH(const std::string& location, it.second) {
-                db.put(usr, location);
-            }
-        }
+    BOOST_FOREACH(const ClicIndex::value_type& it, index) {
+        const std::string& usr = it.first;
+        db.addMultiple(usr, it.second);
     }
 
     return 0;
