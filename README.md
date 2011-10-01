@@ -1,7 +1,7 @@
-CLIC: Clang Indexer for C/C++/Obj-C
-===================================
+CLIC: Clang Indexer for C/C++
+=============================
 
-This is an indexer for C, C++ and Objective-C using the libclang library.
+This is an indexer for C and C++ based on the libclang library.
 
 There are several parts to it:
 
