@@ -1,25 +1,27 @@
 #!/bin/bash
 
 # Specify files to index here
-find . -name "*.cpp" | sort > files2.txt
+SOURCE_PATH=`cd $1; pwd` # convert $1 to an absolute path
+find $SOURCE_PATH -name "*.cpp" | sort > files2.txt
 
 add_to_index() {
-    echo clic_add index.db `cat .clang_complete` $1
-    clic_add index.db `cat .clang_complete` $1
+    INDEX_PATH=`echo ${1}.i.gz | tr "/" "%"`
+    echo clic_add index.db $INDEX_PATH `cat .clang_complete` $1
+    clic_add index.db $INDEX_PATH `cat .clang_complete` $1
 }
 
 remove_from_index() {
-    echo clic_rm index.db $1.i.gz
-    clic_rm index.db $1.i.gz
-    echo rm $1.i.gz
-    rm $1.i.gz
+    INDEX_PATH=`echo ${1}.i.gz | tr "/" "%"`
+    echo clic_rm index.db $INDEX_PATH
+    clic_rm index.db $INDEX_PATH
+    echo rm $INDEX_PATH
+    rm $INDEX_PATH
 }
 
 if [ ! -f index.db -o ! -f files.txt ]; then
     echo "Creating database"
     clic_clear index.db
-    for i in `cat files2.txt`
-    do
+    for i in `cat files2.txt`; do
         add_to_index $i
     done
     mv files2.txt files.txt

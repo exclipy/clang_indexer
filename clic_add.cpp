@@ -74,17 +74,16 @@ enum CXChildVisitResult visitorFunction(
 }
 
 int main(int argc, const char* argv[]) {
-    assert(argc >= 3);
+    assert(argc >= 4);
     const char* dbFilename = argv[1];
+    const char* indexFilename = argv[2];
     const char* sourceFilename = argv[argc-1];
-    argv++;
-    argc--;
 
     // Set up the clang translation unit
     CXIndex cxindex = clang_createIndex(0, 0);
     CXTranslationUnit tu = clang_parseTranslationUnit(
         cxindex, 0,
-        argv, argc,
+        argv + 2, argc - 2, // Skip over dbFilename and indexFilename
         0, 0,
         CXTranslationUnit_None);
 
@@ -111,8 +110,6 @@ int main(int argc, const char* argv[]) {
     ClicIndex& index = visitor.usrToReferences;
 
     // OK, now write the index to a compressed file
-    char* indexFilename = new char[strlen(sourceFilename)+10];
-    sprintf(indexFilename, "%s.i.gz", sourceFilename);
     std::ofstream fout(indexFilename);
     boost::iostreams::filtering_stream<boost::iostreams::output> zout;
     zout.push(boost::iostreams::gzip_compressor());
