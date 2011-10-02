@@ -42,8 +42,8 @@ public:
                 std::string referencedUsr(clang_getCString(clang_getCursorUSR(refCursor)));
                 if (!referencedUsr.empty()) {
                     std::stringstream ss;
-                    ss << kind << ":" << clang_getCString(clang_getFileName(file))
-                       << ":" << line << ":" << column;
+                    ss << clang_getCString(clang_getFileName(file))
+                       << ":" << line << ":" << column << ":" << kind;
                     std::string location(ss.str());
                     usrToReferences[referencedUsr].insert(location);
                 }
