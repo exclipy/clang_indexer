@@ -5,17 +5,17 @@ SOURCE_PATH=`cd $1; pwd` # convert $1 to an absolute path
 find $SOURCE_PATH -name "*.cpp" | sort > files2.txt
 
 add_to_index() {
-    INDEX_PATH=`echo ${1}.i.gz | tr "/" "%"`
-    echo clic_add index.db $INDEX_PATH `cat .clang_complete` $1
-    clic_add index.db $INDEX_PATH `cat .clang_complete` $1
+    INDEX_FILE=`echo ${1}.i.gz | tr "/" "%"`
+    echo clic_add index.db $INDEX_FILE `cat ${SOURCE_PATH}/.clang_complete` $1
+    clic_add index.db $INDEX_FILE `cat ${SOURCE_PATH}/.clang_complete` $1
 }
 
 remove_from_index() {
-    INDEX_PATH=`echo ${1}.i.gz | tr "/" "%"`
-    echo clic_rm index.db $INDEX_PATH
-    clic_rm index.db $INDEX_PATH
-    echo rm $INDEX_PATH
-    rm $INDEX_PATH
+    INDEX_FILE=`echo ${1}.i.gz | tr "/" "%"`
+    echo clic_rm index.db $INDEX_FILE
+    clic_rm index.db $INDEX_FILE
+    echo rm $INDEX_FILE
+    rm $INDEX_FILE
 }
 
 if [ ! -f index.db -o ! -f files.txt ]; then
