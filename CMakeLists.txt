@@ -17,10 +17,11 @@ include_directories(
     ${DB_INCLUDE_DIRS}
 )
 
-add_library(common STATIC clic_parser.cpp clic_printer.cpp)
+add_library(common STATIC clic_parser.cpp clic_printer.cpp ClicDb.cpp)
 
 add_executable(clic_clear clic_clear.cpp)
 target_link_libraries(clic_clear
+    common
     ${DB_LIBRARIES}
 )
 
