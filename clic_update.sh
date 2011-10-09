@@ -2,7 +2,15 @@
 
 # Specify files to index here
 SOURCE_PATH=`cd $1; pwd` # convert $1 to an absolute path
-find $SOURCE_PATH -name "*.cpp" | sort > files2.txt
+find $SOURCE_PATH\
+    -name "*.cpp" -or\
+    -name "*.hpp" -or\
+    -name "*.cxx" -or\
+    -name "*.hxx" -or\
+    -name "*.cc" -or\
+    -name "*.c" -or\
+    -name "*.h"\
+    | sort > files2.txt
 
 add_to_index() {
     INDEX_FILE=`echo ${1}.i.gz | tr "/" "%"`

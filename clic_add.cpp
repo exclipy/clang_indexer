@@ -22,27 +22,35 @@ public:
 
 class EverythingIndexer : public IVisitor {
 public:
+    EverythingIndexer(const char* translationUnitFilename)
+        : translationUnitFilename(translationUnitFilename) {}
+
     virtual enum CXChildVisitResult visit(CXCursor cursor, CXCursor parent) {
+        CXFile file;
+        unsigned int line, column, offset;
+        clang_getInstantiationLocation(
+                clang_getCursorLocation(cursor),
+                &file, &line, &column, &offset);
+        CXCursorKind kind = clang_getCursorKind(cursor);
+        const char* cursorFilename = clang_getCString(clang_getFileName(file));
+
+        if (!clang_getFileName(file).data || strcmp(cursorFilename, translationUnitFilename) != 0) {
+            return CXChildVisit_Continue;
+        }
+
         CXCursor refCursor = clang_getCursorReferenced(cursor);
         if (!clang_equalCursors(refCursor, clang_getNullCursor())) {
-            CXFile file;
-            unsigned int line, column, offset;
-            clang_getInstantiationLocation(
-                    clang_getCursorLocation(cursor),
-                    &file, &line, &column, &offset);
-            CXCursorKind kind = clang_getCursorKind(cursor);
-
             CXFile refFile;
             unsigned int refLine, refColumn, refOffset;
             clang_getInstantiationLocation(
                     clang_getCursorLocation(refCursor),
                     &refFile, &refLine, &refColumn, &refOffset);
 
-            if (clang_getFileName(file).data && clang_getFileName(refFile).data) {
+            if (clang_getFileName(refFile).data) {
                 std::string referencedUsr(clang_getCString(clang_getCursorUSR(refCursor)));
                 if (!referencedUsr.empty()) {
                     std::stringstream ss;
-                    ss << clang_getCString(clang_getFileName(file))
+                    ss << cursorFilename
                        << ":" << line << ":" << column << ":" << kind;
                     std::string location(ss.str());
                     usrToReferences[referencedUsr].insert(location);
@@ -52,16 +60,8 @@ public:
         return CXChildVisit_Recurse;
     }
 
+    const char* translationUnitFilename;
     ClicIndex usrToReferences;
-};
-
-class DefinitionIndexer : public EverythingIndexer {
-public:
-    virtual enum CXChildVisitResult visit(CXCursor cursor, CXCursor parent) {
-        if (!clang_isCursorDefinition(cursor))
-            return CXChildVisit_Recurse;
-        return EverythingIndexer::visit(cursor, parent);
-    }
 };
 
 enum CXChildVisitResult visitorFunction(
@@ -102,7 +102,7 @@ int main(int argc, const char* argv[]) {
     }
 
     // Create the index
-    EverythingIndexer visitor;
+    EverythingIndexer visitor(sourceFilename);
     clang_visitChildren(
             clang_getTranslationUnitCursor(tu),
             &visitorFunction,
