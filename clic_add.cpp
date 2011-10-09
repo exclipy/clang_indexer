@@ -74,7 +74,12 @@ enum CXChildVisitResult visitorFunction(
 }
 
 int main(int argc, const char* argv[]) {
-    assert(argc >= 4);
+    if (argc < 4) {
+        std::cerr << "Usage:\n"
+            << "    " << argv[0] << " <dbFilename> <indexFilename> <sourceFilename>\n";
+        return 1;
+    }
+
     const char* dbFilename = argv[1];
     const char* indexFilename = argv[2];
     const char* sourceFilename = argv[argc-1];

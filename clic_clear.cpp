@@ -2,7 +2,11 @@
 #include <cassert>
 
 int main(int argc, char* argv[]) {
-    assert(argc == 2);
+    if (argc != 2) {
+        std::cerr << "Usage:\n"
+            << "    " << argv[0] << " <dbFilename>\n";
+        return 1;
+    }
     ClicDb db(argv[1]);
     db.clear();
 }

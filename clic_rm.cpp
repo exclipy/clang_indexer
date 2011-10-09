@@ -9,7 +9,11 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-    assert(argc == 3);
+    if (argc != 3) {
+        std::cerr << "Usage:\n"
+            << "    " << argv[0] << " <dbFilename> <indexFilename>\n";
+        return 1;
+    }
 
     ClicDb db(argv[1]);
 
