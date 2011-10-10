@@ -76,7 +76,7 @@ enum CXChildVisitResult visitorFunction(
 int main(int argc, const char* argv[]) {
     if (argc < 4) {
         std::cerr << "Usage:\n"
-            << "    " << argv[0] << " <dbFilename> <indexFilename> <sourceFilename>\n";
+            << "    " << argv[0] << " <dbFilename> <indexFilename> [<options>] <sourceFilename>\n";
         return 1;
     }
 
