@@ -20,7 +20,6 @@ ClicDb::ClicDb(const char* dbFilename) : db(NULL, 0)
 }
 
 ClicDb::~ClicDb() {
-    db.compact(0, 0, 0, 0, DB_FREE_SPACE, 0);
     db.close(0);
 }
 
